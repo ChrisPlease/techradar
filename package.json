@@ -1,0 +1,19 @@
+{
+  "name": "techradar",
+  "version": "1.0.0",
+  "description": "Creates a static tech radar svg",
+  "main": "radar.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mschmidt712/techradar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mschmidt712/techradar/issues"
+  },
+  "homepage": "https://github.com/mschmidt712/techradar"
+}
