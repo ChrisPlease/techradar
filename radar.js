@@ -1,4 +1,4 @@
-function init(h,w) {
+module.exports = function init(h,w) {
   $('#title').text(document.title);  
 	   
  var radar = new pv.Panel()
