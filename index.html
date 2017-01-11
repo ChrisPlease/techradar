@@ -5,7 +5,6 @@
 <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="node_modules/d3/build/d3.min.js"></script>
 <script type="text/javascript" src="node_modules/chance/dist/chance.min.js"></script>
-<script type="text/javascript" charset="utf-8" src="utils.js"></script>
 <script type="text/javascript" charset="utf-8" src="lib/lodash.underscore.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="radars/radarData.js"></script>
 
@@ -24,7 +23,7 @@
 
 </head>
 
-<body onload="init(h,w, radar_data);">
+<body onload="init('Kenzan BadgeBoard', 800, 800, radar_data);">
 <h1 id="title" style="text-align: center;"></h1>
 <div id="radar"></div>
 <div>

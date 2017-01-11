@@ -1,5 +1,3 @@
-//This is the title for your window tab, and your Radar
-document.title = "Kenzan Tech Radar";
 
 //This is your raw data
 //
@@ -35,13 +33,8 @@ document.title = "Kenzan Tech Radar";
 // - Hold: things that are getting attention in the industry, but not ready for use; sometimes they are not mature enough yet, sometimes they are irredeemably flawed
 //      Note: there's no "avoid" ring, but throw things in the hold ring that people shouldn't use.
 
-var h = 800;
-var w = 800;
-
 var radar_data = [
     { "quadrant": "Techniques",
-        "left" : 45,
-        "top" : 18,
         "color" : "#8FA227",
         "items" : [ 
             { name: 'Git flow / Pull Requests ^', arc:'adopt', movement: 'c' },
@@ -75,8 +68,6 @@ var radar_data = [
         ]
     },
     { "quadrant": "Tools",
-        "left": w-200+30,
-        "top" : 18,
         "color" : "#587486",
         "items" : [ 
             { name: 'Git flow / Pull Requests ^', arc:'adopt', movement: 'c' },
@@ -110,8 +101,6 @@ var radar_data = [
   ]
     },
     { "quadrant": "Platforms",
-        "left" :45,
-         "top" : (h/2 + 18),
         "color" : "#DC6F1D",
         "items" : [
             { name: 'Git flow / Pull Requests ^', arc:'adopt', movement: 'c' },
@@ -146,8 +135,6 @@ var radar_data = [
     },
     { "quadrant": "Languages & Frameworks",
         "color" : "#B70062",
-        "left"  : (w-200+30),
-        "top" :   (h/2 + 18),
         "items" : [ 
             { name: 'Git flow / Pull Requests ^', arc:'adopt', movement: 'c' },
             {"name":"Incremental data warehousing", arc:'trial',"movement":"c"},    
