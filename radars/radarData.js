@@ -1,15 +1,5 @@
 //This is the title for your window tab, and your Radar
-document.title = "WotifGroup's Technology Radar (December 2014)";
-
-
-//This is the concentic circles that want on your radar
-var radar_arcs = [
-                   {'r':100,'name':'Adopt'}
-                  ,{'r':200,'name':'Trial'}
-                  ,{'r':300,'name':'Assess'}
-                  ,{'r':400,'name':'Hold'}
-                 // ,{'r':500,'name':'Possible Extra if you want it'}
-                 ];
+document.title = "Kenzan Tech Radar";
 
 //This is your raw data
 //
@@ -45,8 +35,8 @@ var radar_arcs = [
 // - Hold: things that are getting attention in the industry, but not ready for use; sometimes they are not mature enough yet, sometimes they are irredeemably flawed
 //      Note: there's no "avoid" ring, but throw things in the hold ring that people shouldn't use.
 
-var h = 1000;
-var w = 1200;
+var h = 800;
+var w = 800;
 
 var radar_data = [
     { "quadrant": "Techniques",

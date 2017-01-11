@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mschmidt712/techradar/issues"
   },
-  "homepage": "https://github.com/mschmidt712/techradar"
+  "homepage": "https://github.com/mschmidt712/techradar",
+  "dependencies": {
+    "d3": "^4.4.1"
+  }
 }
