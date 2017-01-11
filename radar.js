@@ -23,47 +23,53 @@ function polar_to_raster(r, t, w, h) {
     return cartesian_to_raster(xy[0], xy[1], w, h);
 }
 
-function init(title, h, w, radar_data) {
+function getColor(angle, quadrantData) {
+    var color;
+    var colorMap = {};
+    quadrantData.forEach(function (quadrant) {
+        colorMap[quadrant.upperAngle] = quadrant.color;
+    });
 
-  $('#title').text(title);
-	   
+    angleMultiple = Math.ceil(angle/90) * 90;
+    return colorMap[angleMultiple];
+};
+
+function init(data) {
+  $('#title').text(data.techradar.title);
+
+    var radar_arcs = new Array(data.techradar.arcs.length);
+    
+    data.techradar.arcs.forEach(function (arc, index) {
+        var r = data.techradar.arcDistanceInPixel * arc.order;
+        var name = arc.title;
+        radar_arcs[index] = {r: r, name: name};
+    });
+
+    var w = (data.techradar.arcDistanceInPixel * 4) * 2;
+    var h = (data.techradar.arcDistanceInPixel * 4) * 2;
+
     var radar = d3.select('#radar')
       .append('svg')
       .attr('width', w)
       .attr('height', h);
 
-    var radar_arcs = new Array(4);
-
-    if (h >= w) {
-        radar_arcs = [{'r':(w/2)*(1/4),'name':'Adopt'},
-                        {'r':(w/2)*(2/4),'name':'Trial'},
-                        {'r':(w/2)*(3/4),'name':'Assess'},
-                        {'r':(w/2)*(4/4),'name':'Hold'}];
-    } else {
-        radar_arcs = [{'r':(h/2)*(1/4),'name':'Adopt'},
-                        {'r':(h/2)*(2/4),'name':'Trial'},
-                        {'r':(h/2)*(3/4),'name':'Assess'},
-                        {'r':(h/2)*(4/4),'name':'Hold'}];
-    }
-
-    var numOfCircles = radar_arcs.length;
-    var maxCircleRadius = radar_arcs[numOfCircles - 1].r;
+    var maxCircleRadius = data.techradar.arcDistanceInPixel * 4;
 
     //quadrant lines -- vertical
     radar.append("line")
-            .attr("x1", maxCircleRadius + (w - maxCircleRadius*2)/2)
-            .attr("y1", (h - maxCircleRadius*2)/2)
-            .attr("x2", maxCircleRadius + (w - maxCircleRadius*2)/2)
-            .attr("y2", (maxCircleRadius * 2) + (h - maxCircleRadius*2)/2)
+            .attr("x1", maxCircleRadius)
+            .attr("y1", 0)
+            .attr("x2", maxCircleRadius)
+            .attr("y2", h)
             .attr("stroke-width", 2)    
             .style("stroke", "#ccc");
 
     //quadrant lines -- vertical
     radar.append("line")
-            .attr("x1", (w-(maxCircleRadius * 2))/2)
-            .attr("y1", maxCircleRadius + (h - maxCircleRadius * 2)/2)
-            .attr("x2", w - ((w- (maxCircleRadius * 2))/2))
-            .attr("y2", maxCircleRadius + (h - maxCircleRadius * 2)/2)
+            .attr("x1", 0)
+            .attr("y1", maxCircleRadius)
+            .attr("x2", w)
+            .attr("y2", maxCircleRadius)
             .attr("stroke-width", 2)    
             .style("stroke", "#ccc");
 
@@ -111,94 +117,53 @@ function init(title, h, w, radar_data) {
     var fontSize = 10;
     var total_index = 1;
 
-    radarDataRadianChanceGeneration = {
-        "Tools": {
-            min: blipSize,
-            max: 90 - blipSize,
-        },
-        "Platforms": {
-            min: 90 + blipSize,
-            max: 180 - blipSize,
-        },
-        "Languages & Frameworks": {
-            min: 180 + blipSize,
-            max: 270 - blipSize,
-        },
-        "Techniques": {
-            min: 270 + blipSize,
-            max: 360 - blipSize,
-        }
-    };
+    var radarBlips = radar.selectAll("div")
+        .data(function () {
+            return data.techradar.spots})
+        .enter()
+        .append("g");
 
-    radarDataLengthChanceGeneration = {
-        "adopt": {
-            min: blipSize,
-            max: radar_arcs[0].r - blipSize,
-        },
-        "trial": {
-            min: radar_arcs[0].r + blipSize,
-            max: radar_arcs[1].r - blipSize,
-        },
-        "access": {
-            min: radar_arcs[1].r + blipSize,
-            max: radar_arcs[2].r - blipSize,
-        },
-        "hold": {
-            min: radar_arcs[2].r + blipSize,
-            max: radar_arcs[3].r - blipSize,
-        }
-    };
+    radarBlips.append("circle")
+        .attr("r", function(d) { 
+            return ( d.blipSize !== undefined ? d.blipSize : blipSize );})
+        .attr("cx", function(d) {
+            return polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[0];})
+        .attr("cy", function(d) { 
+            return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1];})
+        .attr("title", function(d) { return d.name;})
+        .attr("angle", Math.PI)
+        .style("cursor", function(d) { return ( d.url !== undefined ? "pointer" : "auto" ); })
+        .on("click", function(d) { 
+            if ( d.url !== undefined ){
+                self.location =  d.url
+            } else {
+                window.location = d.url;
+            }
+        })
+        .attr("stroke", function (d) {
+            return getColor(d.placements[0].coordinates.angle, data.techradar.quadrants);
+        })
+        .style("fill", function (d) {
+            return getColor(d.placements[0].coordinates.angle, data.techradar.quadrants);
+        })
+        .style("opacity", 0.7);
 
-    for (var i = 0; i < radar_data.length; i++) {
-        
-        var itemsByArc = _.groupBy(radar_data[i].items, 'arc');
-        var arcSections = _(itemsByArc).keys();
-
-        var offsetIndex = 0;
-        for (var index in arcSections) {
-            var arcSection = arcSections[index];
-            var radarBlips = radar.selectAll("div")
-                .data(function () {
-                    itemsByArc[arcSection].forEach(function (item) {
-                        var polarLength = chance.integer({min: radarDataLengthChanceGeneration[arcSection].min, 
-                            max: radarDataLengthChanceGeneration[arcSection].max})
-                        var polarRadians = chance.integer({min: radarDataRadianChanceGeneration[radar_data[i].quadrant].min, 
-                            max: radarDataRadianChanceGeneration[radar_data[i].quadrant].max})
-
-                        item.radians = polarRadians;
-                        item.length = polarLength;
-                    });
-                    return itemsByArc[arcSection]})
-                .enter()
-                .append("g");
-
-            radarBlips.append("circle")
-                .attr("r", function(d) { 
-                    return ( d.blipSize !== undefined ? d.blipSize : blipSize );})
-                .attr("cx", function(d) {
-                    return polar_to_raster(d.length, d.radians, w, h)[0];})
-                .attr("cy", function(d) { 
-                    return h - polar_to_raster(d.length, d.radians, w, h)[1];})
-                .attr("title", function(d) { return d.name;})
-                .attr("angle", Math.PI)
-                .style("cursor", function(d) { return ( d.url !== undefined ? "pointer" : "auto" ); })
-                .on("click", function(d) { if ( d.url !== undefined ){self.location =  d.url}})
-                .attr("stroke", radar_data[i].color)
-                .style("fill", radar_data[i].color)
-                .style("opacity", 0.7)
-
-            radarBlips.append("text")
-                .text(function(d) {
-                    return total_index++;})
-                .attr("x", function(d) { 
-                    return polar_to_raster(d.length, d.radians, w, h)[0] - 2.5;})
-                .attr("y", function(d) { 
-                    return h - polar_to_raster(d.length, d.radians, w, h)[1] + 3;})
-                .style("textBaseline", "middle")
-                .style("font", "10px solid black")
-                .style("font-color", "#000")
-        }
-    }
+    radarBlips.append("text")
+        .text(function(d) {
+            return d.id;})
+        .attr("x", function(d) { 
+            var offeset;
+            if (d.id < 10) {
+                offset = 2.5;
+            } else if (d.id > 10 && d.id < 100) {
+                offset = 5;
+            } else if (d.id > 100) {
+                offset = 7.5;
+            }
+            return polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[0] - offset;})
+        .attr("y", function(d) { 
+            return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1] + 3;})
+        .style("textBaseline", "middle")
+        .style("font", "10px solid black")
+        .style("font-color", "#000")
 };
-
-
