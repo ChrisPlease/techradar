@@ -1,5 +1,5 @@
 //util functions
-function polar_to_cartesian(r,t) {  
+function polar_to_cartesian(r,t) {
     //radians to degrees, requires the t*pi/180
     var x = r * Math.cos((t*Math.PI/180));
     var y = r * Math.sin((t*Math.PI/180));
@@ -36,22 +36,19 @@ function getColor(angle, quadrantData) {
 
 function init(data) {
   $('#title').text(data.title);
-
     var radar_arcs = new Array(data.arcs.length);
-    
+
     data.arcs.forEach(function (arc, index) {
         var r = data.arcDistanceInPixel * arc.order;
-        var name = arc.title;
+        var name = arc.title || '';
         radar_arcs[index] = {r: r, name: name};
     });
 
     var w = (data.arcDistanceInPixel * 4) * 2;
     var h = (data.arcDistanceInPixel * 4) * 2;
-
     var radar = d3.select('#radar')
       .append('svg')
-      .attr('width', w)
-      .attr('height', h);
+      .attr('viewBox', '0 0 ' + w + ' ' + h);
 
     var maxCircleRadius = data.arcDistanceInPixel * 4;
 
@@ -61,7 +58,7 @@ function init(data) {
             .attr("y1", 0)
             .attr("x2", maxCircleRadius)
             .attr("y2", h)
-            .attr("stroke-width", 2)    
+            .attr("stroke-width", 2)
             .style("stroke", "#ccc");
 
     //quadrant lines -- vertical
@@ -70,7 +67,7 @@ function init(data) {
             .attr("y1", maxCircleRadius)
             .attr("x2", w)
             .attr("y2", maxCircleRadius)
-            .attr("stroke-width", 2)    
+            .attr("stroke-width", 2)
             .style("stroke", "#ccc");
 
 
@@ -87,7 +84,7 @@ function init(data) {
         .attr("r", function (d) {return d.r;})
         .attr("fill", "none")
         .attr("stroke", "#ccc")
-        .attr("id", function (d) { 
+        .attr("id", function (d) {
             return "arc" + d.name;})
 
     radarFontSize = 16;
@@ -102,6 +99,7 @@ function init(data) {
         })
         .attr("x", function (d) {
             return w/2 - (d.name.length * radarFontSize / 4) })
+        .style('font-family', "Verdana")
         .style("font", radarFontSize + "px solid black")
         .style("font-weight", "bold")
 
@@ -124,16 +122,16 @@ function init(data) {
         .append("g");
 
     radarBlips.append("circle")
-        .attr("r", function(d) { 
+        .attr("r", function(d) {
             return ( d.blipSize !== undefined ? d.blipSize : blipSize );})
         .attr("cx", function(d) {
             return polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[0];})
-        .attr("cy", function(d) { 
+        .attr("cy", function(d) {
             return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1];})
         .attr("title", function(d) { return d.name;})
         .attr("angle", Math.PI)
         .style("cursor", function(d) { return ( d.url !== undefined ? "pointer" : "auto" ); })
-        .on("click", function(d) { 
+        .on("click", function(d) {
             if ( d.url !== undefined ){
                 self.location =  d.url
             }
@@ -149,7 +147,7 @@ function init(data) {
     radarBlips.append("text")
         .text(function(d) {
             return d.id;})
-        .attr("x", function(d) { 
+        .attr("x", function(d) {
             var offeset;
             if (d.id < 10) {
                 offset = 2.5;
@@ -159,9 +157,9 @@ function init(data) {
                 offset = 7.5;
             }
             return polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[0] - offset;})
-        .attr("y", function(d) { 
+        .attr("y", function(d) {
             return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1] + 3;})
-        .on("click", function(d) { 
+        .on("click", function(d) {
             if ( d.url !== undefined ){
                 self.location =  d.url
             }
