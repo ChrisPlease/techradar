@@ -35,25 +35,25 @@ function getColor(angle, quadrantData) {
 };
 
 function init(data) {
-  $('#title').text(data.techradar.title);
+  $('#title').text(data.title);
 
-    var radar_arcs = new Array(data.techradar.arcs.length);
+    var radar_arcs = new Array(data.arcs.length);
     
-    data.techradar.arcs.forEach(function (arc, index) {
-        var r = data.techradar.arcDistanceInPixel * arc.order;
+    data.arcs.forEach(function (arc, index) {
+        var r = data.arcDistanceInPixel * arc.order;
         var name = arc.title;
         radar_arcs[index] = {r: r, name: name};
     });
 
-    var w = (data.techradar.arcDistanceInPixel * 4) * 2;
-    var h = (data.techradar.arcDistanceInPixel * 4) * 2;
+    var w = (data.arcDistanceInPixel * 4) * 2;
+    var h = (data.arcDistanceInPixel * 4) * 2;
 
     var radar = d3.select('#radar')
       .append('svg')
       .attr('width', w)
       .attr('height', h);
 
-    var maxCircleRadius = data.techradar.arcDistanceInPixel * 4;
+    var maxCircleRadius = data.arcDistanceInPixel * 4;
 
     //quadrant lines -- vertical
     radar.append("line")
@@ -119,7 +119,7 @@ function init(data) {
 
     var radarBlips = radar.selectAll("div")
         .data(function () {
-            return data.techradar.spots})
+            return data.spots})
         .enter()
         .append("g");
 
@@ -136,15 +136,13 @@ function init(data) {
         .on("click", function(d) { 
             if ( d.url !== undefined ){
                 self.location =  d.url
-            } else {
-                window.location = d.url;
             }
         })
         .attr("stroke", function (d) {
-            return getColor(d.placements[0].coordinates.angle, data.techradar.quadrants);
+            return getColor(d.placements[0].coordinates.angle, data.quadrants);
         })
         .style("fill", function (d) {
-            return getColor(d.placements[0].coordinates.angle, data.techradar.quadrants);
+            return getColor(d.placements[0].coordinates.angle, data.quadrants);
         })
         .style("opacity", 0.7);
 
@@ -163,6 +161,12 @@ function init(data) {
             return polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[0] - offset;})
         .attr("y", function(d) { 
             return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1] + 3;})
+        .on("click", function(d) { 
+            if ( d.url !== undefined ){
+                self.location =  d.url
+            }
+        })
+        .style("cursor", function(d) { return ( d.url !== undefined ? "pointer" : "auto" ); })
         .style("textBaseline", "middle")
         .style("font", "10px solid black")
         .style("font-color", "#000")
