@@ -1,42 +1,6 @@
 var d3 = require('d3');
 var $ = require('jquery');
 
-//util functions
-function polar_to_cartesian(r,t) {
-  //radians to degrees, requires the t*pi/180
-  var x = r * Math.cos((t*Math.PI/180));
-  var y = r * Math.sin((t*Math.PI/180));
-  return [x,y];
-}
-
-function cartesian_to_raster(x, y, w, h) {
-  var rx = w/2 + x;
-  var ry = h/2 + y;
-  return [rx,ry];
-}
-
-function raster_to_cartesian(rx, ry, w, h) {
-  var x = rx - w/2;
-  var y = ry - h/2;
-  return [x,y];
-}
-
-function polar_to_raster(r, t, w, h) {
-  var xy= polar_to_cartesian(r, t);
-  return cartesian_to_raster(xy[0], xy[1], w, h);
-}
-
-function getColor(angle, quadrantData) {
-  var color;
-  var colorMap = {};
-  quadrantData.forEach(function (quadrant) {
-    colorMap[quadrant.upperAngle] = quadrant.color;
-  });
-
-  angleMultiple = Math.ceil(angle/90) * 90;
-  return colorMap[angleMultiple];
-};
-
 // Export this function 
 module.exports = function init(data) {
   $('#title').text(data.title);
@@ -173,4 +137,40 @@ module.exports = function init(data) {
       .style("font-family", "Open Sans")
       .style('font-size', fontSize + 'px')
       .style("fill", "#FFF")
+};
+
+//util functions
+function polar_to_cartesian(r,t) {
+  //radians to degrees, requires the t*pi/180
+  var x = r * Math.cos((t*Math.PI/180));
+  var y = r * Math.sin((t*Math.PI/180));
+  return [x,y];
+}
+
+function cartesian_to_raster(x, y, w, h) {
+  var rx = w/2 + x;
+  var ry = h/2 + y;
+  return [rx,ry];
+}
+
+function raster_to_cartesian(rx, ry, w, h) {
+  var x = rx - w/2;
+  var y = ry - h/2;
+  return [x,y];
+}
+
+function polar_to_raster(r, t, w, h) {
+  var xy= polar_to_cartesian(r, t);
+  return cartesian_to_raster(xy[0], xy[1], w, h);
+}
+
+function getColor(angle, quadrantData) {
+  var color;
+  var colorMap = {};
+  quadrantData.forEach(function (quadrant) {
+    colorMap[quadrant.upperAngle] = quadrant.color;
+  });
+
+  angleMultiple = Math.ceil(angle/90) * 90;
+  return colorMap[angleMultiple];
 };
