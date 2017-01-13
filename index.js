@@ -1,3 +1,6 @@
+var d3 = require('d3');
+var $ = require('jquery');
+
 //util functions
 function polar_to_cartesian(r,t) {
   //radians to degrees, requires the t*pi/180
@@ -34,7 +37,8 @@ function getColor(angle, quadrantData) {
   return colorMap[angleMultiple];
 };
 
-function init(data) {
+// Export this function 
+module.exports = function init(data) {
   $('#title').text(data.title);
   var radar_arcs = new Array(data.arcs.length);
 
@@ -49,6 +53,7 @@ function init(data) {
   var radar = d3.select('#radar')
     .append('svg')
     .attr('viewBox', '0 0 ' + w + ' ' + h);
+
   var maxCircleRadius = data.arcDistanceInPixel * data.arcs.length;
 
   //quadrant lines -- vertical
@@ -149,7 +154,7 @@ function init(data) {
         var offset;
         if (d.id < 10) {
           offset = 3.5;
-        } else if (d.id > 10 && d.id < 100) {
+        } else if (d.id >= 10 && d.id < 100) {
           offset = 7;
         } else if (d.id >= 100) { // equal or greater than
           offset = 10.5;
@@ -157,7 +162,7 @@ function init(data) {
         return polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[0] - offset;
       })
       .attr("y", function(d) {
-        return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1] + (fontSize / 4);})
+        return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1] + (fontSize / 3);})
       .on("click", function(d) {
         if ( d.url !== undefined ){
           self.location =  d.url
