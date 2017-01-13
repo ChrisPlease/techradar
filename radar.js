@@ -49,7 +49,6 @@ function init(data) {
   var radar = d3.select('#radar')
     .append('svg')
     .attr('viewBox', '0 0 ' + w + ' ' + h);
-
   var maxCircleRadius = data.arcDistanceInPixel * data.arcs.length;
 
   //quadrant lines -- vertical
@@ -88,24 +87,25 @@ function init(data) {
         return "arc" + d.name;
       });
 
-  radarFontSize = 16;
+  radarFontSize = 18;
   radarCircles
       .append("text")
       .attr("xlink:href", function (d) {
         return "arc" + d.name})
       .text(function (d) {
         return d.name})
-      .attr("y", function (d) {
-        return w/2 - d.r + radarFontSize;
-      })
       .attr("x", function (d) {
-        return w/2 - (d.name.length * radarFontSize / 4) })
-      .style('font-family', "Verdana")
-      .style("font", radarFontSize + "px solid black")
+        return w/2 + (d.r - data.arcDistanceInPixel) + 4; // 4 is a magic number for extra padding
+      })
+      .attr("y", function (d) {
+        return w/2 - (radarFontSize / 2);
+      })
+      .style("font-size", radarFontSize + "px")
+      .style("font-family", "Verdana")
       .style("font-weight", "bold");
 
-    //Quadrant Ledgends
-  var blipSize = 10;
+    //Quadrant Legends
+  var blipSize = 15;
   var radar_quadrant_ctr=1;
   var quadrantFontSize = 18;
   var headingFontSize = 14;
@@ -113,14 +113,15 @@ function init(data) {
   var lastRadius = 0;
   var lastQuadrant='';
   var spacer = 6;
-  var fontSize = 10;
+  var fontSize = 12;
   var total_index = 1;
 
   var radarBlips = radar.selectAll("div")
       .data(function () {
         return data.spots})
       .enter()
-      .append("g");
+      .append("g")
+      .attr('class', 'plot-point');
 
   radarBlips.append("circle")
       .attr("r", function(d) {
@@ -137,30 +138,26 @@ function init(data) {
           self.location =  d.url
         }
       })
-      .attr("stroke", function (d) {
-        return getColor(d.placements[0].coordinates.angle, data.quadrants);
-      })
       .style("fill", function (d) {
         return getColor(d.placements[0].coordinates.angle, data.quadrants);
-      })
-      .style("opacity", 0.7);
+      });
 
   radarBlips.append("text")
       .text(function(d) {
         return d.id;})
       .attr("x", function(d) {
-        var offeset;
+        var offset;
         if (d.id < 10) {
-          offset = 2.5;
+          offset = 3.5;
         } else if (d.id > 10 && d.id < 100) {
-          offset = 5;
-        } else if (d.id > 100) {
-          offset = 7.5;
+          offset = 7;
+        } else if (d.id >= 100) { // equal or greater than
+          offset = 10.5;
         }
         return polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[0] - offset;
       })
       .attr("y", function(d) {
-        return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1] + 3;})
+        return h - polar_to_raster(d.placements[0].coordinates.radius, d.placements[0].coordinates.angle, w, h)[1] + (fontSize / 4);})
       .on("click", function(d) {
         if ( d.url !== undefined ){
           self.location =  d.url
@@ -168,6 +165,7 @@ function init(data) {
       })
       .style("cursor", function(d) { return ( d.url !== undefined ? "pointer" : "auto" ); })
       .style("textBaseline", "middle")
-      .style("font", "10px solid black")
-      .style("font-color", "#000")
+      .style("font-family", "Open Sans")
+      .style('font-size', fontSize + 'px')
+      .style("fill", "#FFF")
 };
